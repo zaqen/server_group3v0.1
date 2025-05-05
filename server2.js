@@ -2,7 +2,7 @@ const express = require("express")
 const os = require("os")
 
 const app = new express()
-const portNr = 8080
+const portNr = 8082
 // const balancerIP = 192.168.1.?
 var timesResponded = 0
 
