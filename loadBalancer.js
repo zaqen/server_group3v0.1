@@ -75,6 +75,6 @@ app.get('{*any}', async (req, res) => {
   }
 });
 
-app.listen(80, () => {
+app.listen(8080, () => {
   console.log('Load balancer running on port 80');
 });
