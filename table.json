@@ -1,0 +1,43 @@
+[
+  {
+    "id": 1,
+    "firstName": "Jimmy",
+    "lastName": "Trygg",
+    "age": 36,
+    "hackerName": "J-Tryx",
+    "hackerPower": "Expert på att kryptera med egenutvecklade algoritmer"
+  },
+  {
+    "id": 2,
+    "firstName": "Fabian",
+    "lastName": "Görl",
+    "age": 23,
+    "hackerName": "Fabbyte",
+    "hackerPower": "Kan omvandla vilken kod som helst till optimerad maskinkod"
+  },
+  {
+    "id": 3,
+    "firstName": "Samuel",
+    "lastName": "Johansson",
+    "age": 36,
+    "hackerName": "Sudoel",
+    "hackerPower": "Har ett gränssnitt direkt till dark web i sitt sinne"
+  },
+  {
+    "id": 4,
+    "firstName": "Linus",
+    "lastName": "Forslin",
+    "age": 28,
+    "hackerName": "Lin.ux",
+    "hackerPower": "Kan kontrollera och sabotera alla Linux-servrar med bara sin röst"
+  },
+  {
+    "id": 5,
+    "firstName": "Marcus",
+    "lastName": "Henriksson",
+    "age": 38,
+    "hackerName": "MHack",
+    "hackerPower": "Bryter igenom brandväggar som om de vore papper"
+  }
+]
+
