@@ -2,7 +2,7 @@ const express = require('express');
 const axios = require('axios');
 
 const app = express();
-
+const registerApp = express();
 // Backend servers
 const servers = [
   'http://localhost:8081',
@@ -60,6 +60,13 @@ app.use((req, res, next) => {
   next();
 });
 
+registerApp.use(express.json());
+registerApp.post("/register", (req, res) => {
+    const { ip, port, timestamp } = req.body;
+    console.log(`Mottagit rapport från server: IP=${ip}, port=${port}, tid=${timestamp}`);
+    res.send("Rapport mottagen.");
+});
+
 // Handler for incoming requests
 app.get('{*any}', async (req, res) => {
 
@@ -75,6 +82,10 @@ app.get('{*any}', async (req, res) => {
   }
 });
 
+
 app.listen(8080, () => {
-  console.log('Load balancer running on port 80');
+  console.log('Load balancer running on port 8080');
+});
+registerApp.listen(8090, () => {
+  console.log('Load balancer running registration port 8090');
 });

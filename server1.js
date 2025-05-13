@@ -1,10 +1,13 @@
 const express = require("express")
 const os = require("os")
+const http = require("http");
 
 const app = new express()
 const portNr = 8081
 // const balancerIP = 192.168.1.?
 var timesResponded = 0
+app.use(express.json());
+
 
 function getServerIP() {
     const interface = os.networkInterfaces()
@@ -18,6 +21,38 @@ function getServerIP() {
     return "Kan inte hitta IP"
 }
 
+function reportServerIPAndID() {
+    const data = JSON.stringify({
+        ip: getServerIP(),
+        port: portNr,
+        timestamp: new Date().toISOString()
+    });
+    const options = {
+        hostname: '127.0.0.1', // ändra till mottagande serverIP
+        port: 8090,
+        path: '/register',
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'Content-Length': data.length
+        }
+    };
+    const req = http.request(options, res => {
+        let body = '';
+        res.on('data', chunk => body += chunk);
+        res.on('end', () => {
+            console.log(`Svar från mottagare: ${body}`);
+        });
+    });
+
+    req.on('error', error => {
+        console.error('Fel vid rapportering:', error.message);
+    });
+    req.write(data);
+    req.end();
+}
+
+reportServerIPAndID();
 
 app.listen(portNr, () => {
     console.log(`Servern ligger nu på ${portNr} och lyssnar`)
