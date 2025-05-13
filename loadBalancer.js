@@ -89,3 +89,4 @@ app.listen(8080, () => {
 registerApp.listen(8090, () => {
   console.log('Load balancer running registration port 8090');
 });
+
