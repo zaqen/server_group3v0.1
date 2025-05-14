@@ -5,8 +5,8 @@ const app = express();
 const registerApp = express();
 // Backend servers
 const servers = [
-  'http://localhost:8081',
-  'http://localhost:8082'
+  'http://192.168.1.89:8081',
+  'http://192.168.1.91:8081'
 ];
 
 // Current index of backend server
