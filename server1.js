@@ -5,10 +5,13 @@ const fs = require('fs');
 
 const app = new express()
 const appDatabase = new express()
+
 const portNr = 8081
-const portNrDB = 8100
+const serverIP = getServerIP()
+const databaseIP = "192.168.1.90"
+const databasePortNr = 8100
+const loadBalancerIP = "192.168.1.88"
 const loadBalancerPortNr = 8090
-// const balancerIP = 192.168.1.?
 var timesResponded = 0
 app.use(express.json());
 
@@ -32,7 +35,7 @@ function reportServerIPAndID() {
         timestamp: new Date().toISOString()
     });
     const options = {
-        hostname: '127.0.0.1', // ändra till mottagande serverIP
+        hostname: loadBalancerIP, // ändra till mottagande serverIP
         port: loadBalancerPortNr,
         path: '/register',
         method: 'POST',
@@ -63,7 +66,7 @@ reportServerIPAndID();
 appDatabase.get('/table', async (req, res) => {
   try {
     // Skicka HTTP-förfrågan till databasservern
-    const response = await axios.get(`http://localhost:${portNrDB}/data/table`);
+    const response = await axios.get(`http://${databaseIP}:${databasePortNr}/table`);
     res.send(response.data);
   } catch (error) {
     res.status(500).send({ error: 'Kunde inte hämta data från databasen' });
@@ -74,7 +77,7 @@ appDatabase.post('/table', async (req, res) => {
     const newUser = req.body;
 
     // Skicka vidare till databasen
-    const response = await axios.post(`http://localhost:${portNrDB}/data/table`, newUser);
+    const response = await axios.post(`http://${databaseIP}:${databasePortNr}/table`, newUser);
 
     // Returnera svaret till klienten
     res.status(201).send(response.data);
@@ -83,7 +86,7 @@ appDatabase.post('/table', async (req, res) => {
   }
 });
 appDatabase.listen(8100, () => {
-  console.log(`Webbservern kör mot Databasen på http://localhost:${portNrDB}`);
+  console.log(`Webbservern kör mot Databasen på http://${databaseIP}:${databasePortNr}`);
 });
 
 function generateHackerCards() {
@@ -92,9 +95,9 @@ function generateHackerCards() {
 
     return users.map(user => `
         <div class="card">
-            <h2>${user.firstName} ${user.lastName} <span class="alias">(${user.hackerName})</span></h2>
+            <h2>${user.hackerName}</h2>
+            <div><span class="alias">(${user.firstName} ${user.lastName})</span></div>
             <div class="power">${user.hackerPower}</div>
-            <div>Ålder: ${user.age}</div>
         </div>
     `).join('');
 }

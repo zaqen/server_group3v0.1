@@ -8,7 +8,7 @@ const app = new express()
 const portNr = 8100
 app.use(express.json());
 
-app.get('/data/table', (req, res) => {
+app.get('/table', (req, res) => {
   fs.readFile('./table.json', 'utf8', (err, data) => {
     if (err) {
       return res.status(500).send({ error: 'Kunde inte läsa användardata' });
@@ -18,7 +18,7 @@ app.get('/data/table', (req, res) => {
   });
 });
 
-app.post('/data/table', (req, res) => {
+app.post('/table', (req, res) => {
   const newUser = req.body;
 
   fs.readFile(dataPath, 'utf8', (err, data) => {
