@@ -2,6 +2,7 @@ const express = require("express")
 const os = require("os")
 const http = require("http");
 const fs = require('fs');
+const axios = require('axios');
 
 const app = new express()
 const appDatabase = new express()
@@ -89,18 +90,26 @@ appDatabase.listen(8100, () => {
   console.log(`Webbservern kör mot Databasen på http://${databaseIP}:${databasePortNr}`);
 });
 
-function generateHackerCards() {
-    let rawData = fs.readFileSync('./table.json', 'utf8'); // justera sökvägen om det behövs
-    let users = JSON.parse(rawData);
+const axios = require('axios');
 
-    return users.map(user => `
-        <div class="card">
-            <h2>${user.hackerName}</h2>
-            <div><span class="alias">(${user.firstName} ${user.lastName})</span></div>
-            <div class="power">${user.hackerPower}</div>
-        </div>
-    `).join('');
+async function generateHackerCards() {
+    try {
+        const response = await axios.get(`http://${databaseIP}:${databasePortNr}/table`);
+        const users = response.data;
+
+        return users.map(user => `
+            <div class="card">
+                <h2>${user.hackerName}</h2>
+                <div><span class="alias">(${user.firstName} ${user.lastName})</span></div>
+                <div class="power">${user.hackerPower}</div>
+            </div>
+        `).join('');
+    } catch (error) {
+        console.error("Kunde inte hämta data från databasservern", error);
+        return `<div class="card">Kunde inte ladda hackerdata</div>`;
+    }
 }
+
 
 app.listen(portNr, () => {
     console.log(`Servern ligger nu på ${portNr} och lyssnar`)
@@ -109,8 +118,9 @@ app.listen(portNr, () => {
 app.get("/health", (req, res) => {
     res.status(200).send("OK");
 });
-app.get("/", (req, res)=>{
+app.get("/", async (req, res)=>{
     timesResponded++
+    const hackerCards = await generateHackerCards()
     let klientIP = (req.headers["x-forwarded-for"] || req.socket.remoteAddress).split(",")[0].trim()
     if (klientIP === "::1" || klientIP === "127.0.0.1"){
         klientIP = "Du kör lokalt, dvs loopback" 
@@ -183,7 +193,7 @@ app.get("/", (req, res)=>{
             </div>
 
             <div class="cards">
-                ${generateHackerCards()}
+                ${hackerCards}
             </div>
         </body>
     </html>
