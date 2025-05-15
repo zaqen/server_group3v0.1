@@ -43,6 +43,10 @@ app.post("/register", (req, res) => {
 
 // Handler for incoming requests
 app.get('{*any}', async (req, res) => {
+  if (req.url === "/favicon.ico")
+  {
+    return
+  }
   if (servers.length === 0)
   {
     res.send("no backeend servers")
