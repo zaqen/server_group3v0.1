@@ -20,6 +20,7 @@ function getNextServer() {
   return servers[currentIndex]
 }
 
+//uses json form server greting to add the server in to ther servers array
 function addServer(aData)
 {
   servers.push("http://" + aData.ip + ":" + aData.port)
@@ -34,6 +35,7 @@ app.use((req, res, next) => {
 
 app.use(express.json());
 
+//recives regestrarion messages foram beckend servers
 app.post("/register", (req, res) => {
     addServer(req.body)
     const { ip, port, timestamp } = req.body;
@@ -68,6 +70,7 @@ app.listen(portNr, () => {
   console.log(`Load balancer running on port ${portNr}`);
 });
 
+//loops over all servers in the servers array and removes those who do not respond
 setInterval( async() => 
 {
   for (let i=0;i<servers.length; i++)
