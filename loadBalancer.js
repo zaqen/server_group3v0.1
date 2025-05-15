@@ -1,58 +1,29 @@
 const express = require('express');
 const axios = require('axios');
+const portNr = 8080
+const interval = 5000
 
 const app = express();
-const registerApp = express();
-// Backend servers
-const servers = [
-  'http://192.168.1.89:8081',
-  'http://192.168.1.91:8081'
-];
+
+const servers = [];
 
 // Current index of backend server
 let currentIndex = 0;
 
 // Function for getting next backend server
 function getNextServer() {
-  const server = servers[currentIndex];
-  currentIndex = (currentIndex + 1) % servers.length;
-  return server;
-}
-
-/*/ Health check
-async function healthCheck() {
-  // Loop through servers and health check each one
-  for (let i = servers.length - 1; i >= 0; i--) {
-    try {
-      const result = await axios.get(servers[i] + '/health');
-      if (result.status !== 200) {
-        servers.splice(i, 1);
-      }
-    } catch (err) {
-      servers.splice(i, 1); // Kunde inte nå servern alls
-    }
+  if (currentIndex >= servers.length)
+  {
+    currentIndex = 0;
   }
-
-  // Add servers back once they become available
-  setInterval(async () => {
-    let serverAdded = false;
-    for (let i = 0; i < servers.length; i++) {
-      const result = await axios.get(servers[i] + '/health');
-      if (result.status === 200 && !servers.includes(servers[i])) {
-        servers.push(servers[i]);
-        serverAdded = true;
-      }
-    }
-    if (serverAdded) {
-      console.log('Server added back to pool');
-    }
-  }, 5000);
-
+  return servers[currentIndex]
 }
 
-// Run health check
-healthCheck();
-*/
+function addServer(aData)
+{
+  servers.push("http://" + aData.ip + ":" + aData.port)
+  console.log("server: " + servers[servers.length-1] + " registerd")
+}
 
 // Log requests
 app.use((req, res, next) => {
@@ -60,8 +31,10 @@ app.use((req, res, next) => {
   next();
 });
 
-registerApp.use(express.json());
-registerApp.post("/register", (req, res) => {
+app.use(express.json());
+
+app.post("/register", (req, res) => {
+    addServer(req.body)
     const { ip, port, timestamp } = req.body;
     console.log(`Mottagit rapport från server: IP=${ip}, port=${port}, tid=${timestamp}`);
     res.send("Rapport mottagen.");
@@ -69,10 +42,14 @@ registerApp.post("/register", (req, res) => {
 
 // Handler for incoming requests
 app.get('{*any}', async (req, res) => {
+  if (servers.length === 0)
+  {
+    res.send("no backeend servers")
+    return
+  }
 
-  // Get next backend server
   const server = getNextServer();
-
+  
   // Forward request
   try {
     const result = await axios.get(server + req.url);
@@ -82,11 +59,29 @@ app.get('{*any}', async (req, res) => {
   }
 });
 
-
-app.listen(8080, () => {
-  console.log('Load balancer running on port 8080');
-});
-registerApp.listen(8090, () => {
-  console.log('Load balancer running registration port 8090');
+app.listen(portNr, () => {
+  console.log(`Load balancer running on port ${portNr}`);
 });
 
+setInterval( async() => 
+{
+  for (let i=0;i<servers.length; i++)
+  {
+    try
+    {
+      const res = await axios.get(servers[i] + "/health")
+      if (res.status !== 200)
+      {
+        console.log("removed server:" + servers[i] + " eror status:" + res.status)
+        servers.splice(i,1)
+        i--
+      }
+    }
+    catch
+    {
+      console.log("removed server:" + servers[i] + " not responding")
+      servers.splice(i,1)
+      i--
+    }
+  }
+}, interval);

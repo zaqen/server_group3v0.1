@@ -11,7 +11,7 @@ const serverIP = getServerIP()
 const databaseIP = "192.168.1.90"
 const databasePortNr = 8100
 const loadBalancerIP = "192.168.1.88"
-const loadBalancerPortNr = 8090
+const loadBalancerPortNr = 8080
 var timesResponded = 0
 app.use(express.json());
 
