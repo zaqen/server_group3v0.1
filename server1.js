@@ -9,7 +9,7 @@ const appDatabase = new express()
 
 const portNr = 8081
 const serverIP = getServerIP()
-const databaseIP = "192.168.1.96"
+const databaseIP = "192.168.1.99"
 const databasePortNr = 8100
 const loadBalancerIP = "192.168.1.95"
 const loadBalancerPortNr = 8080
