@@ -12,6 +12,7 @@ let currentIndex = 0;
 
 // Function for getting next backend server
 function getNextServer() {
+  currentIndex++;
   if (currentIndex >= servers.length)
   {
     currentIndex = 0;
@@ -49,7 +50,7 @@ app.get('{*any}', async (req, res) => {
   }
 
   const server = getNextServer();
-  
+
   // Forward request
   try {
     const result = await axios.get(server + req.url);
