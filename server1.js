@@ -90,8 +90,6 @@ appDatabase.listen(8100, () => {
   console.log(`Webbservern kör mot Databasen på http://${databaseIP}:${databasePortNr}`);
 });
 
-const axios = require('axios');
-
 async function generateHackerCards() {
     try {
         const response = await axios.get(`http://${databaseIP}:${databasePortNr}/table`);
