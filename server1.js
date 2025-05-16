@@ -9,9 +9,9 @@ const appDatabase = new express()
 
 const portNr = 8081
 const serverIP = getServerIP()
-const databaseIP = "192.168.1.99"
+const databaseIP = process.argv[3];
 const databasePortNr = 8100
-const loadBalancerIP = "192.168.1.95"
+const loadBalancerIP = process.argv[2];
 const loadBalancerPortNr = 8080
 var timesResponded = 0
 app.use(express.json());
@@ -52,15 +52,27 @@ function reportServerIPAndID() {
             console.log(`Svar från mottagare: ${body}`);
         });
     });
-
+    // Hantera fel vid rapportering eller inmatningsfel
     req.on('error', error => {
         console.error('Fel vid rapportering:', error.message);
     });
+    // Hantera odefinierad IP-adress vid uppstart
+    if (loadBalancerIP === undefined) {
+        console.log('Load Balancer IP är inte definierad. När du kör filen bör du skriva in lastbalanserarens IP och sedan databasens IP separerat med ett mellanslag.');
+        console.error("Avslutar skriptet på grund av ogiltig IP-adress till lastbalanserare.");
+        process.exit(1);
+    }
+    if (databaseIP === undefined) {
+        console.log('Databasens IP är inte definierad. När du kör filen bör du skriva in lastbalanserarens IP och sedan databasens IP separerat med ett mellanslag.');
+        console.error("Avslutar skriptet på grund av ogiltig IP-adress till databas.");
+        process.exit(1);
+    }
     req.write(data);
     req.end();
 }
 //Kör hälsning en gång vid uppstart
 reportServerIPAndID();
+
 
 
 //Här införskaffar webbservern och skickar JSON-data till/från database
