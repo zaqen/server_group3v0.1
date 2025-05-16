@@ -135,7 +135,8 @@ app.get("/", async (req, res)=>{
     if (klientIP === "::1" || klientIP === "127.0.0.1"){
         klientIP = "Du kör lokalt, dvs loopback" 
     }
-    res.send(`<html>
+        res.send(`
+    <html>
         <head>
             <title>Grupp 3s Server</title>
             <style>
@@ -183,6 +184,22 @@ app.get("/", async (req, res)=>{
                     margin-top: 10px;
                     color: #444;
                 }
+                .video-container {
+                    position: fixed;
+                    bottom: 20px;
+                    left: 20px;
+                    width: 240px;
+                    height: 426px;
+                    box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+                    z-index: 1000;
+                    border-radius: 8px;
+                    overflow: hidden;
+                }
+                .video-container iframe {
+                    width: 100%;
+                    height: 100%;
+                    border: none;
+                }
             </style>
         </head>
         <body>
@@ -190,10 +207,10 @@ app.get("/", async (req, res)=>{
                 <h1>Välkommen till Grupp 3s Server!</h1>
                 <div class="info">
                     Jag har svarat <strong>${timesResponded}</strong> gånger sen jag startades.
-                </div>                    
+                </div>
                 <div class="info">
                     Jag använder port: <strong>${portNr}</strong>
-                </div> 
+                </div>
                 <div class="info">
                     Serverns IPv4-adress är: <strong>${getServerIP()}</strong>
                 </div>
@@ -205,7 +222,16 @@ app.get("/", async (req, res)=>{
             <div class="cards">
                 ${hackerCards}
             </div>
+
+            <!-- Video Embed -->
+            <div class="video-container">
+                <iframe
+                    src="https://www.youtube.com/embed/zZ7AimPACzc?start=26&autoplay=1&mute=1"
+                    allow="autoplay; encrypted-media"
+                    allowfullscreen>
+                </iframe>
+            </div>
         </body>
     </html>
-`)
-})
+    `);
+});
