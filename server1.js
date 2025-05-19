@@ -28,7 +28,7 @@ function getServerIP() {
     }
     return "Kan inte hitta IP"
 }
-//hälsning till Load Balancern
+//Hälsning till lastbalanseraren, detta är för att registrera serverns IP och portnummer
 function reportServerIPAndID() {
     const data = JSON.stringify({
         ip: getServerIP(),
@@ -70,7 +70,7 @@ function reportServerIPAndID() {
     req.write(data);
     req.end();
 }
-//Kör hälsning en gång vid uppstart
+//KÖR hälsning en gång vid uppstart
 reportServerIPAndID();
 
 
@@ -85,6 +85,7 @@ appDatabase.get('/table', async (req, res) => {
     res.status(500).send({ error: 'Kunde inte hämta data från databasen' });
   }
 });
+//Oanvänd för tillfället men kan i framtiden användas för att registrera nya kort i databasens tabell
 appDatabase.post('/table', async (req, res) => {
   try {
     const newUser = req.body;
@@ -98,10 +99,12 @@ appDatabase.post('/table', async (req, res) => {
     res.status(500).send({ error: 'Kunde inte spara användare i databasen' });
   }
 });
+//Lyssnar på port 8100 för att hämta data från databasen
 appDatabase.listen(8100, () => {
   console.log(`Webbservern kör mot Databasen på http://${databaseIP}:${databasePortNr}`);
 });
 
+//Hämtar data från databasen och skapar kort med informationen som kan presenteras med HTML
 async function generateHackerCards() {
     try {
         const response = await axios.get(`http://${databaseIP}:${databasePortNr}/table`);
@@ -120,14 +123,18 @@ async function generateHackerCards() {
     }
 }
 
-
+//Lyssnar på lastbalanseraren och skickar data till den
 app.listen(portNr, () => {
     console.log(`Servern ligger nu på ${portNr} och lyssnar`)
     console.log(`Serverns IP är; ${getServerIP()}`)
 })
+//hälsocheck för att se om servern är igång, anropas av lastbalanseraren
 app.get("/health", (req, res) => {
     res.status(200).send("OK");
 });
+
+//Sammanställning och presentation av hemsidan med HTML. 
+//Svarsruta, hackerkort och en video som spelas upp i en iframe
 app.get("/", async (req, res)=>{
     timesResponded++
     const hackerCards = await generateHackerCards()
