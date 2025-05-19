@@ -37,13 +37,10 @@ module.exports = {
 };
 
 
-
 app.get('/table', (req, res) => {
   getHackers((err, data) => {
     if (err) {
       console.error('Fel vid hämtning av data:', err);
-//  fs.readFile('./table.json', 'utf8', (err, data) => {
-//    if (err) {
       return res.status(500).send({ error: 'Kunde inte läsa användardata' });
     }
     res.setHeader('Content-Type', 'application/json');
@@ -77,8 +74,21 @@ app.post('/table', (req, res) => {
   });
 });
 
+
+function getDBIP() {
+    const interface = os.networkInterfaces()
+    for (const name of Object.keys(interface)) {
+        for (const inface of interface[name]) {
+            if (inface.family === "IPv4" && !inface.internal) {
+                return inface.address
+            }
+        }
+    }
+    return "Kan inte hitta IP"
+}
+
 app.listen(portNr, () => {
-  console.log(`Databasserver kör på http://localhost:${portNr}`);
+  console.log(`Databasserver kör på http://${getDBIP()}:${portNr}`);
 });
 
 
