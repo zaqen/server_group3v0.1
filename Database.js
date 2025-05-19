@@ -8,14 +8,15 @@ const app = new express()
 const portNr = 8100
 app.use(express.json());
 
-// Anslutning till databasen
+// Anslutningsdata till lokala MySQL-databasen
 const db = mysql.createConnection({
-  host: 'localhost',           // eller din VM IP om den körs i en container
+  host: 'localhost',           
   user: 'ZaQen',
   password: 'hejsan123',
   database: 'hackers_db'
 });
 
+//koppla upp och logga in på mySQL-databasen
 db.connect((err) => {
   if (err) {
     console.error('Kunde inte ansluta till databasen:', err);
@@ -24,11 +25,11 @@ db.connect((err) => {
   console.log('Ansluten till MySQL');
 });
 
-// Funktion för att hämta all data som JSON
+// Funktion för att hämta all data som JSON-kompatibel data från tabellen "hackers"
 function getHackers(callback) {
   db.query('SELECT * FROM hackers', (err, results) => {
     if (err) return callback(err, null);
-    callback(null, results); // results är redan ett JSON-kompatibelt objekt
+    callback(null, results); 
   });
 }
 
@@ -36,7 +37,7 @@ module.exports = {
   getHackers
 };
 
-
+//Tar emot en förfrågan och svarar för tillfället med hela table-datan från MySQL-databasen
 app.get('/table', (req, res) => {
   getHackers((err, data) => {
     if (err) {
@@ -48,6 +49,9 @@ app.get('/table', (req, res) => {
   });
 });
 
+
+//Vidarebyggnad, används ej för tillfället. 
+//Detta är ett sätt att spara data i en JSON och sedan pusha den till databasen
 app.post('/table', (req, res) => {
   const newUser = req.body;
 
@@ -75,6 +79,8 @@ app.post('/table', (req, res) => {
 });
 
 
+
+//Hämtar IP-adressen till servern så att den kan deklareras i terminalen
 function getDBIP() {
     const interface = os.networkInterfaces()
     for (const name of Object.keys(interface)) {
@@ -87,6 +93,8 @@ function getDBIP() {
     return "Kan inte hitta IP"
 }
 
+//Startar servern och lyssnar på port 8100
+// Om IP-adressen inte kan hittas, loggas ett felmeddelande
 app.listen(portNr, () => {
   console.log(`Databasserver kör på http://${getDBIP()}:${portNr}`);
 });
