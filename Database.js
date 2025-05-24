@@ -3,6 +3,7 @@ const fs = require('fs');
 const path = require('path');
 const dataPath = path.join(__dirname, 'table.json');
 const mysql = require('mysql2');
+const os = require('os');
 
 const app = new express()
 const portNr = 8100
