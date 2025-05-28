@@ -1,7 +1,6 @@
 const express = require("express")
 const os = require("os")
 const http = require("http");
-const fs = require('fs');
 const axios = require('axios');
 
 const app = new express()
